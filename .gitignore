@@ -44,3 +44,11 @@ next-env.d.ts
 /logs/
 /src-tauri/target/
 /src-tauri/installer.jar.log
+
+# Minecraft mod build cache / Gradle / NeoForge MDK (моды arclight-auth — локальные, не коммитятся)
+mods/**/build/
+mods/**/.gradle/
+mods/**/run/
+mods/**/MDK-*/
+mods/arclight-auth/client-mod/MDK-1.21.1-ModDevGzip/
+
