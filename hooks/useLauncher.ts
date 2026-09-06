@@ -12,7 +12,7 @@ export function useLauncher() {
     error: null,
   });
 
-  const launch = useCallback(async (mcVersion: string, nfVersion: string, memoryMb: number) => {
+  const launch = useCallback(async (mcVersion: string, nfVersion: string, memoryMb: number, username?: string) => {
     setState({ isLaunching: true, progress: 0, message: 'Инициализация...', error: null });
 
     let unlisten: UnlistenFn | null = null;
@@ -33,6 +33,7 @@ export function useLauncher() {
         mcVersion,
         nfVersion,
         memoryMb,
+        username,
       });
 
       // Если дошли сюда, значит всё прошло успешно (100%)

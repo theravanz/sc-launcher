@@ -6,6 +6,7 @@ import { FiUser, FiSettings, FiLogOut, FiChevronDown, FiPlay, FiClock, FiBox, Fi
 import { FaGamepad } from 'react-icons/fa';
 import { useAuth } from '@/hooks/useAuth';
 import { useLauncher } from '@/hooks/useLauncher';
+import { sanitizeMinecraftUsername } from '@/lib/username';
 
 interface MainMenuProps {
   onSettings: () => void;
@@ -71,12 +72,23 @@ export default function MainMenu({ onSettings, onAccountSettings }: MainMenuProp
     };
   }, [changelogOpen, isLaunching]);
 
+  // Ник берём из Discord (Supabase кладёт его в user_metadata). В GUI показываем как есть,
+  // а в игру передаём санитизированный вариант (транслит + A-Za-z0-9_).
+  const rawUsername =
+    user?.user_metadata?.username ||
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.user_name ||
+    user?.user_metadata?.name ||
+    user?.email?.split('@')[0] ||
+    '';
+  const username = rawUsername || 'Пользователь';
+  const gameUsername = sanitizeMinecraftUsername(rawUsername);
+
   const handlePlay = () => {
     // Используем стабильную версию NeoForge для 1.21.1
-    launch('1.21.1', '21.1.249', 4096);
+    launch('1.21.1', '21.1.249', 4096, gameUsername);
   };
 
-  const username = user?.user_metadata?.username || 'Пользователь';
   const email = user?.email || '';
   const avatarUrl = user?.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.id}`;
   const latestChange = CHANGELOG_HISTORY[0];

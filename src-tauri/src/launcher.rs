@@ -15,6 +15,7 @@ pub struct LaunchContext {
     pub nf_version: String,
     pub java_path: PathBuf,
     pub memory_mb: i32,
+    pub username: String,
 }
 
 fn extract_natives(zip_path: &PathBuf, dest_dir: &PathBuf) -> Result<(), String> {
@@ -400,7 +401,7 @@ eprintln!("📦 Классов в classpath: {}", classpath.len());
          .replace("${game_directory}", game_dir)
          .replace("${assets_root}", assets_root)
          .replace("${asset_index}", asset_index)
-         .replace("${auth_player_name}", "Player")
+         .replace("${auth_player_name}", &ctx.username)
          .replace("${auth_uuid}", "00000000-0000-0000-0000-000000000000")
          .replace("${auth_access_token}", "0")
          .replace("${user_type}", "msa")
@@ -469,7 +470,7 @@ if let Some(game_args) = profile.get("arguments")
 
 // ✅ 8. Базовые игровые аргументы (обязательные для запуска)
 args.push("--username".to_string());
-args.push("Player".to_string());
+args.push(ctx.username.clone());
 args.push("--version".to_string());
 args.push(id.clone());
 args.push("--gameDir".to_string());

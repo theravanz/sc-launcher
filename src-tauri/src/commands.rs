@@ -17,6 +17,7 @@ pub async fn launch_game(
     mc_version: String,
     nf_version: String,
     memory_mb: i32,
+    username: Option<String>,
 ) -> Result<(), String> {
     let app_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
     
@@ -34,6 +35,7 @@ pub async fn launch_game(
         nf_version,
         java_path: find_java()?,
         memory_mb,
+        username: username.unwrap_or_else(|| "Player".to_string()),
     };
     
     launch_minecraft(&ctx, |p, msg| emit(p, msg)).await?;

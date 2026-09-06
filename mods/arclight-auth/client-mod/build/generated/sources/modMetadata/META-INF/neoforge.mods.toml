@@ -1,0 +1,28 @@
+# MyProject Launcher Auth — неофициальная автономная сборка.
+# Формат и поля соответствуют официальному MDK NeoForge 1.21.1 (ModDevGradle).
+modLoader="javafml" #mandatory
+loaderVersion="[1,)" #mandatory
+license="All Rights Reserved"
+
+[[mods]] #mandatory
+modId="myproject" #mandatory
+version="1.0.0" #mandatory
+displayName="MyProject Launcher Auth" #mandatory
+description='''
+Гейтинг-модуль: передаёт Supabase JWT на сервер по каналу myproject:auth.
+'''
+# Не указываем credits/authors — достаточно базовых полей.
+
+[[dependencies.myproject]] #optional
+modId="neoforge" #mandatory
+type="required" #mandatory
+versionRange="[21.1.249,)" #mandatory
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.myproject]] #optional
+modId="minecraft"
+type="required"
+versionRange="[1.21.1]"
+ordering="NONE"
+side="BOTH"

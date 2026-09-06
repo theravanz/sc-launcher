@@ -1,0 +1,3 @@
+com/myproject/launcherauth/plugin/AuthPlugin.class
+com/myproject/launcherauth/plugin/JwtValidator.class
+com/myproject/launcherauth/plugin/JwtValidator$JwtPayload.class

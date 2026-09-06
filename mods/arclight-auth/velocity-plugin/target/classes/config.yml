@@ -1,0 +1,23 @@
+# ===== StructureCraftAuth (Velocity) — конфигурация =====
+# ВАЖНО: куда закинуть Supabase-токен (JSON Web Token key / HMAC secret).
+#
+# Кладём JWT-секрет в поле supabase-jwt-secret и перезагружаем плагин:
+#   /scauth reload   (команда плагина)
+# (или перезапуск прокси).
+
+# Секретный ключ, которым подписаны валидные JWT-токены лаунчера.
+# Взять его можно в панели Supabase:
+#   Supabase Dashboard → Project Settings → API → JWT Secret
+#
+# Вариант 1 — ОБЫЧНАЯ строка (рекомендуется):
+#   просто вставь значение JWT Secret как есть (в одинарных кавычках).
+#   В этом случае supabase-jwt-secret-is-base64 задай в false.
+#
+# Вариант 2 — base64 (необязательно):
+#   если хочешь передать ключ в base64, закодируй JWT Secret в base64
+#   и оставь supabase-jwt-secret-is-base64 в true.
+supabase-jwt-secret: ''
+supabase-jwt-secret-is-base64: false
+
+# Как долго ждём JWT от клиента на прокси, до кика.
+auth-timeout-seconds: 5

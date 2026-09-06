@@ -1,0 +1,25 @@
+# ===== StructureCraftAuth — конфигурация =====
+# ВАЖНО: куда закинуть Supabase-токен (JSON Web Token key / HMAC secret).
+#
+# Кладём JWT-секрет в поле supabase-jwt-secret и перезагружаем плагин:
+#   /structurecraftauth reload   (или алиас /scauth reload)
+# (или перезапуск сервера).
+
+# Секретный ключ, которым подписаны валидные JWT-токены лаунчера.
+# Взять его можно в панели Supabase:
+#   Supabase Dashboard → Project Settings → API → JWT Secret
+# (JWT Secret по умолчанию — это строка вида
+#  "super-secret-jwt-token-with-at-least-32-characters-long")
+#
+# Вариант 1 — ОБЫЧНАЯ строка (рекомендуется):
+#   просто вставь значение JWT Secret как есть (в одинарных кавычках).
+#   В этом случае supabase-jwt-secret-is-base64 задай в false.
+#
+# Вариант 2 — base64 (необязательно):
+#   если хочешь передать ключ в base64, закодируй JWT Secret в base64
+#   и оставь supabase-jwt-secret-is-base64 в true.
+supabase-jwt-secret: ''
+supabase-jwt-secret-is-base64: false
+
+# Сколько секунд ждать JWT при входе игрока, до кика, если токен не получен.
+auth-timeout-seconds: 5

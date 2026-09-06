@@ -1,0 +1,14 @@
+# ===== StructureCraftAuth — конфигурация =====
+# Скопируйте этот файл в plugins/StructureCraftAuth/config.yml
+# (или отредактируйте сгенерированный плагином при первом запуске).
+
+# Твой Supabase JWT Secret (Dashboard -> Settings -> API -> JWT Secret).
+# Это секрет, которым Supabase подписывает access-токены (alg=HS256).
+supabase-jwt-secret: 'CHANGE_ME___ваш_supabase_jwt_secret'
+
+# Если True — строка выше трактуется как base64 и декодируется в байты ключа HMAC.
+# Для секретов Supabase (и большинства стандартных) оставляйте True.
+supabase-jwt-secret-is-base64: false
+
+# Через сколько секунд кикать игрока, не приславшего/приславшего невалидный JWT.
+auth-timeout-seconds: 5

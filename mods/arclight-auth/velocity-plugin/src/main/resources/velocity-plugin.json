@@ -1,0 +1,8 @@
+{
+  "id": "structurecraftauth",
+  "name": "StructureCraftAuth",
+  "version": "1.0.0",
+  "authors": ["myproject"],
+  "main": "com.structurecraft.launcherauth.velocity.VelocityAuthPlugin",
+  "description": "Allows only players logged in via the official launcher (verified Supabase JWT via the myproject:auth channel)."
+}

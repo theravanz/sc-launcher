@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Сборка серверного плагина MyProject Launcher Auth для Arclight 1.21.1.
+  Валидатор JWT использует только JDK (javax.crypto), поэтому внешние
+  зависимости не требуются — достаточно spigot-api для компиляции.
+
+  УКАЖИ точную координату spigot-api, соответствующую твоему Arclight 1.21.1
+  (артифакт и репозиторий см. в доке Arclight; пример ниже — org.bukkit).
+-->
+<project xmlns="http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.structurecraft</groupId>
+  <artifactId>structurecraftauth</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <maven.compiler.release>21</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <repositories>
+    <!-- Официальный Spigot snapshot-репозиторий для spigot-api 1.21.1.
+         Репозиторий Arclight (repo.arclight.mcmod.cn) временно недоступен
+         (DNS/TLS), поэтому используем стандартный источник Spigot API. -->
+    <repository>
+      <id>spigot-snapshots</id>
+      <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <!-- Spigot-API для компиляции; в рантайме уже есть (scope = compile для IDE,
+         не упаковываем в итоговый jar). -->
+    <dependency>
+      <groupId>org.spigotmc</groupId>
+      <artifactId>spigot-api</artifactId>
+      <version>1.21.1-R0.1-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>StructureCraftAuth-${project.version}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <release>${maven.compiler.release}</release>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
