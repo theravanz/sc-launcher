@@ -50,5 +50,4 @@ mods/**/build/
 mods/**/.gradle/
 mods/**/run/
 mods/**/MDK-*/
-mods/arclight-auth/client-mod/MDK-1.21.1-ModDevGzip/
-
+mods/**/MDK-1.21.1-ModDevGzip/
