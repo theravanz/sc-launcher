@@ -51,3 +51,4 @@ mods/**/.gradle/
 mods/**/run/
 mods/**/MDK-*/
 mods/**/MDK-1.21.1-ModDevGzip/
+mods/**/MDK-1.21.1-ModDevGradle/
