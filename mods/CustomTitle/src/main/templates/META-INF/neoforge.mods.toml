@@ -1,0 +1,28 @@
+modLoader="javafml"
+   loaderVersion="[1,)"
+license="MIT"
+
+[[mods]]
+modId="scctitle"
+version="1.0.0"
+displayName="StructureCraft Custom Menu"
+description='''
+Кастомное главное меню специально для StructureCraft
+'''
+
+[[dependencies.scctitle]]
+    modId="neoforge"
+    type="required"
+    versionRange="[21.1.0,)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.scctitle]]
+    modId="minecraft"
+    type="required"
+    versionRange="[1.21.1,)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[mixins]]
+config="scctitle.mixins.json"

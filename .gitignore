@@ -52,3 +52,11 @@ mods/**/run/
 mods/**/MDK-*/
 mods/**/MDK-1.21.1-ModDevGzip/
 mods/arclight-auth/client-mod/MDK-1.21.1-ModDevGradle
+
+.gradle/
+build/
+*.log
+mods/CustomTitle/gradle/wrapper
+mods/CustomTitle/gradle
+mods/arclight-auth/client-mod/MDK-1.21.1-ModDevGradle
+mods/arclight-auth/client-mod/gradle
