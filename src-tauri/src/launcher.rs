@@ -284,6 +284,74 @@ for lib in &vanilla_details.libraries {
 
 eprintln!("✅ Собрано {} уникальных библиотек", classpath.len());
 
+// === ШАГ 3.5: Скачивание ассетов (РЕСУРСОВ) ===
+    on_progress(60.0, "Скачивание ресурсов...".to_string());
+    
+    // Получаем ID и URL индекса ассетов из профиля или ванильных деталей
+    let asset_index = vanilla_details.asset_index.as_ref()
+        .expect("asset_index обязателен для запуска Minecraft");
+
+    let asset_index_id = profile.get("assetIndex")
+        .and_then(|a| a.get("id")).and_then(|s| s.as_str())
+        .unwrap_or(&asset_index.id);
+    
+    let asset_index_url = profile.get("assetIndex")
+        .and_then(|a| a.get("url")).and_then(|s| s.as_str())
+        .unwrap_or(&asset_index.url);
+
+    let indexes_dir = assets_dir.join("indexes");
+    std::fs::create_dir_all(&indexes_dir).map_err(|e| e.to_string())?;
+    let index_file = indexes_dir.join(format!("{}.json", asset_index_id));
+    
+    // 1. Скачиваем сам индекс (файл 17.json)
+    if !index_file.exists() {
+        download_file_with_progress(
+            &client,
+            asset_index_url,
+            &index_file,
+            None,
+            None,
+            |p| on_progress(60.0 + p * 0.1, format!("Скачивание индекса ресурсов {}...", asset_index_id)),
+        ).await?;
+    }
+    
+    // 2. Парсим индекс и скачиваем отдельные файлы ресурсов (звуки, текстуры и т.д.)
+    let index_data = std::fs::read_to_string(&index_file).map_err(|e| e.to_string())?;
+    let index_json: Value = serde_json::from_str(&index_data).map_err(|e| e.to_string())?;
+    
+    if let Some(objects) = index_json.get("objects").and_then(|v| v.as_object()) {
+        let total_objects = objects.len();
+        let objects_dir = assets_dir.join("objects");
+        std::fs::create_dir_all(&objects_dir).map_err(|e| e.to_string())?;
+        
+        for (i, (_, obj)) in objects.iter().enumerate() {
+            let hash = obj.get("hash").and_then(|v| v.as_str()).unwrap_or("");
+            if hash.is_empty() { continue; }
+            
+            let hash_prefix = &hash[..2];
+            let object_path = objects_dir.join(hash_prefix).join(hash);
+            
+            if !object_path.exists() {
+                let object_url = format!("https://resources.download.minecraft.net/{}/{}", hash_prefix, hash);
+                let size = obj.get("size").and_then(|v| v.as_i64());
+                
+                download_file_with_progress(
+                    &client,
+                    &object_url,
+                    &object_path,
+                    Some(hash),
+                    size,
+                    |_| {},
+                ).await?;
+            }
+            
+            if i % 100 == 0 {
+                on_progress(70.0 + (10.0 * (i as f64 / total_objects as f64)), format!("Скачивание ресурсов {}/{}", i + 1, total_objects));
+            }
+        }
+    }
+
+
 // === Пропатченный клиентский jar (game jar) ===
 // Реальные классы Minecraft находятся в пропатченном инсталлером neoforge-<v>-client.jar.
 // Если его нет — запускаем официальный installer (--installClient), который применит
