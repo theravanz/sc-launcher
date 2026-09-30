@@ -11,8 +11,13 @@ import {
   FiAlertTriangle,
   FiCheck,
   FiMaximize,
+  FiRefreshCw,
+  FiDownloadCloud,
 } from 'react-icons/fi';
 import { invoke } from '@tauri-apps/api/core';
+import { getVersion } from '@tauri-apps/api/app';
+import { isDesktopApp } from '@/lib/tauriEnv';
+import type { AppUpdater } from '@/hooks/useAppUpdater';
 import {
   DEFAULT_SETTINGS,
   WINDOW_PRESETS,
@@ -28,9 +33,11 @@ import type { LauncherSettings, SystemInfo, WindowMode } from '@/lib/launcherSet
 interface LauncherSettingsModalProps {
   open: boolean;
   onClose: () => void;
+  /** Состояние автообновления лаунчера (проверка/загрузка/установка) */
+  updater?: AppUpdater;
 }
 
-export default function LauncherSettingsModal({ open, onClose }: LauncherSettingsModalProps) {
+export default function LauncherSettingsModal({ open, onClose, updater }: LauncherSettingsModalProps) {
   const [settings, setSettings] = useState<LauncherSettings>(DEFAULT_SETTINGS);
   const [system, setSystem] = useState<SystemInfo | null>(null);
   const [saving, setSaving] = useState(false);
@@ -43,6 +50,8 @@ export default function LauncherSettingsModal({ open, onClose }: LauncherSetting
   // Настройки подгружены в текущем открытии — до этого не сохраняем,
   // чтобы не перезаписать файл дефолтами
   const [loadedOpen, setLoadedOpen] = useState(false);
+  // Версия приложения (для блока обновлений)
+  const [appVersion, setAppVersion] = useState<string | null>(null);
 
   const patch = (p: Partial<LauncherSettings>) => setSettings((prev) => ({ ...prev, ...p }));
   const currentMode = settings.window_mode;
@@ -63,6 +72,13 @@ export default function LauncherSettingsModal({ open, onClose }: LauncherSetting
 
         setSettings({ ...DEFAULT_SETTINGS, ...s });
         setSystem(sys);
+
+        // Версия приложения — для блока «Обновления» (только внутри Tauri)
+        if (isDesktopApp()) {
+          getVersion()
+            .then((v) => { if (!cancelled) setAppVersion(v); })
+            .catch(() => {});
+        }
 
         // Лимит ползунка = вся ОЗУ ПК (но не больше 32 ГБ)
         const limit = memoryLimit(sys.total_memory_mb);
@@ -142,6 +158,32 @@ export default function LauncherSettingsModal({ open, onClose }: LauncherSetting
   };
 
   const memValue = Math.min(settings.memory_mb, maxMemory);
+
+  // Состояние автообновления для блока «Обновления»
+  const updateBusy =
+    !!updater &&
+    (updater.status === 'checking' ||
+      updater.status === 'downloading' ||
+      updater.status === 'installing' ||
+      updater.status === 'restarting');
+
+  const updateStatusText = (() => {
+    if (!updater) return null;
+    switch (updater.status) {
+      case 'checking':
+        return 'проверяем обновления...';
+      case 'downloading':
+        return `загрузка обновления${updater.version ? ` v${updater.version}` : ''} — ${updater.percent}%`;
+      case 'installing':
+        return 'установка обновления...';
+      case 'restarting':
+        return 'перезапуск лаунчера...';
+      case 'error':
+        return null; // ошибка показывается отдельной плашкой
+      default:
+        return 'установлена последняя версия';
+    }
+  })();
 
   return (
     <AnimatePresence>
@@ -291,6 +333,35 @@ export default function LauncherSettingsModal({ open, onClose }: LauncherSetting
               </div>
 
               {error && <div className="settings-error">{error}</div>}
+
+              {/* ===== ОБНОВЛЕНИЯ ЛАУНЧЕРА ===== */}
+              {updater && (
+                <div className="settings-section">
+                  <div className="settings-section-header">
+                    <FiDownloadCloud size={14} />
+                    <span>Обновления лаунчера</span>
+                  </div>
+
+                  <div className="settings-actions-row">
+                    <button
+                      className="settings-action-btn"
+                      onClick={() => void updater.checkNow()}
+                      disabled={updateBusy}
+                    >
+                      <FiRefreshCw size={14} />
+                      {updater.status === 'checking' ? 'Проверяем...' : 'Проверить обновления'}
+                    </button>
+                  </div>
+
+                  <p className="settings-hint">
+                    {`Текущая версия: ${appVersion ? `v${appVersion}` : '—'}`}
+                    {updateStatusText ? ` · ${updateStatusText}` : ''}
+                    {' '}Новые версии ставятся автоматически при запуске лаунчера.
+                  </p>
+
+                  {updater.error && <div className="settings-error">{updater.error}</div>}
+                </div>
+              )}
             </div>
 
             {/* Индикатор автосохранения */}

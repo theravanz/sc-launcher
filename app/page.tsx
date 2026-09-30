@@ -10,7 +10,9 @@ import SuccessAnimation from '@/components/SuccessAnimation';
 import MainMenu from '@/components/MainMenu';
 import WindowControls from '@/components/WindowControls';
 import DragRegion from '@/components/DragRegion';
+import UpdaterOverlay from '@/components/UpdaterOverlay';
 import { useAuth } from '@/hooks/useAuth';
+import { useAppUpdater } from '@/hooks/useAppUpdater';
 
 type View = 'login' | 'register' | 'forgot-password' | 'verification' | 'success' | 'main-menu';
 
@@ -18,6 +20,13 @@ export default function Home() {
   const { user, loading } = useAuth();
   const [view, setView] = useState<View>('login');
   const [verificationEmail, setVerificationEmail] = useState('');
+
+  // Автообновление лаунчера: проверка при запуске + установка и перезапуск
+  const updater = useAppUpdater();
+
+  const updaterOverlay = (
+    <UpdaterOverlay status={updater.status} percent={updater.percent} version={updater.version} />
+  );
 
   const handleVerificationSuccess = useCallback((email: string) => {
     setVerificationEmail(email);
@@ -43,6 +52,7 @@ export default function Home() {
           <div className="spinner" />
           <p>Загрузка...</p>
         </div>
+        {updaterOverlay}
       </main>
     );
   }
@@ -54,7 +64,8 @@ export default function Home() {
         <div className="background-blur" />
         <DragRegion />
         <WindowControls />
-        <MainMenu onAccountSettings={() => console.log('Настройки аккаунта')} />
+        <MainMenu updater={updater} onAccountSettings={() => console.log('Настройки аккаунта')} />
+        {updaterOverlay}
       </main>
     );
   }
@@ -110,10 +121,13 @@ export default function Home() {
         {view === 'main-menu' && (
           <MainMenu
             key="main-menu"
+            updater={updater}
             onAccountSettings={() => console.log('Настройки аккаунта')}
           />
         )}
       </AnimatePresence>
+
+      {updaterOverlay}
     </main>
   );
 }

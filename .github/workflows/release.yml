@@ -1,0 +1,70 @@
+name: release
+
+# Пуш тега vX.Y.Z собирает приложение и публикует релиз вместе с latest.json,
+# который читает автообновление (plugins.updater.endpoints в tauri.conf.json).
+# ВАЖНО: версия в src-tauri/tauri.conf.json должна совпадать с тегом (v0.1.1 -> "0.1.1").
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'windows-latest'
+            args: ''
+          - platform: 'ubuntu-22.04'
+            args: ''
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'pnpm'
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf xdg-utils
+
+      - name: install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: build and release
+        uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Приватный ключ подписи: содержимое ~/.tauri/sc-launcher.key
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          # У текущего ключа пароля нет, поэтому секрет оставляем пустым
+          # (если пересоздать ключ с паролем — положить пароль сюда)
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'StructureCraft ${{ github.ref_name }}'
+          releaseBody: 'Обновление скачается лаунчером автоматически при следующем запуске.'
+          # Черновик не подходит: эндпоинт /releases/latest/download/latest.json видит только опубликованные релизы
+          releaseDraft: false
+          prerelease: false
+          # latest.json для автообновления + NSIS-инсталлятор (под plugins.updater.windows.installMode)
+          uploadUpdaterJson: true
+          updaterJsonPreferNsis: true
+          args: ${{ matrix.args }}

@@ -2405,6 +2405,17 @@ body {
   color: #f87171;
 }
 
+.settings-action-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.settings-action-btn:disabled:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .settings-error {
   padding: 9px 12px;
   background: rgba(239, 68, 68, 0.1);

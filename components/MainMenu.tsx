@@ -8,9 +8,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLauncher } from '@/hooks/useLauncher';
 import { sanitizeMinecraftUsername } from '@/lib/username';
 import LauncherSettingsModal from '@/components/LauncherSettingsModal';
+import type { AppUpdater } from '@/hooks/useAppUpdater';
 
 interface MainMenuProps {
   onAccountSettings: () => void;
+  /** Состояние автообновления (проверка при запуске + ручная из настроек) */
+  updater?: AppUpdater;
 }
 
 const CHANGELOG_HISTORY = [
@@ -38,7 +41,7 @@ const CHANGELOG_HISTORY = [
   },
 ];
 
-export default function MainMenu({ onAccountSettings }: MainMenuProps) {
+export default function MainMenu({ onAccountSettings, updater }: MainMenuProps) {
   const { user, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [changelogOpen, setChangelogOpen] = useState(false);
@@ -258,7 +261,11 @@ export default function MainMenu({ onAccountSettings }: MainMenuProps) {
       </AnimatePresence>
 
       {/* Модалка настроек лаунчера */}
-      <LauncherSettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <LauncherSettingsModal
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        updater={updater}
+      />
     </div>
   );
 }
