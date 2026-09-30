@@ -1,14 +1,24 @@
 'use client';
 
 import { getCurrentWindow } from '@tauri-apps/api/window';
+import { isDesktopApp } from '@/lib/tauriEnv';
 
 export default function WindowControls() {
-  const appWindow = getCurrentWindow();
+  // Tauri-окно получаем внутри обработчиков: при рендере (в т.ч. на SSR) window недоступен
+  const handleMinimize = async () => {
+    if (!isDesktopApp()) return;
+    await getCurrentWindow().minimize();
+  };
+
+  const handleClose = async () => {
+    if (!isDesktopApp()) return;
+    await getCurrentWindow().close();
+  };
 
   return (
     <div className="window-controls">
       <button 
-        onClick={() => appWindow.minimize()} 
+        onClick={handleMinimize} 
         className="control-btn" 
         title="Свернуть"
         type="button"
@@ -19,7 +29,7 @@ export default function WindowControls() {
       </button>
       
       <button 
-        onClick={() => appWindow.close()} 
+        onClick={handleClose} 
         className="control-btn close-btn" 
         title="Закрыть"
         type="button"
