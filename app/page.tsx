@@ -54,10 +54,7 @@ export default function Home() {
         <div className="background-blur" />
         <DragRegion />
         <WindowControls />
-        <MainMenu 
-          onSettings={() => console.log('Настройки')}
-          onAccountSettings={() => console.log('Настройки аккаунта')}
-        />
+        <MainMenu onAccountSettings={() => console.log('Настройки аккаунта')} />
       </main>
     );
   }
@@ -113,7 +110,6 @@ export default function Home() {
         {view === 'main-menu' && (
           <MainMenu
             key="main-menu"
-            onSettings={() => console.log('Настройки')}
             onAccountSettings={() => console.log('Настройки аккаунта')}
           />
         )}

@@ -12,7 +12,7 @@ export function useLauncher() {
     error: null,
   });
 
-  const launch = useCallback(async (mcVersion: string, nfVersion: string, memoryMb: number, username?: string) => {
+  const launch = useCallback(async (mcVersion: string, nfVersion: string, memoryMb?: number | null, username?: string) => {
     setState({ isLaunching: true, progress: 0, message: 'Инициализация...', error: null });
 
     let unlisten: UnlistenFn | null = null;

@@ -16,6 +16,9 @@ pub struct LaunchContext {
     pub java_path: PathBuf,
     pub memory_mb: i32,
     pub username: String,
+    /// Финальный размер окна игры из настроек: (w, h) или (0, 0) для fullscreen.
+    /// Уже ограничен разрешением монитора (см. commands::resolve_game_window).
+    pub window: (u32, u32),
 }
 
 fn extract_natives(zip_path: &PathBuf, dest_dir: &PathBuf) -> Result<(), String> {
@@ -555,6 +558,19 @@ args.push("--userType".to_string());
 args.push("msa".to_string());
 args.push("--versionType".to_string());
 args.push("release".to_string());
+
+// ✅ 9. Окно игры — из настроек лаунчера (уже ограничено разрешением монитора)
+match ctx.window {
+    (0, 0) => {
+        args.push("--fullscreen".to_string());
+    }
+    (w, h) => {
+        args.push("--width".to_string());
+        args.push(w.to_string());
+        args.push("--height".to_string());
+        args.push(h.to_string());
+    }
+}
     
     eprintln!("🚀 Аргументы Java ({} шт):", args.len());
 for (i, arg) in args.iter().enumerate() {

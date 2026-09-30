@@ -3,6 +3,7 @@
 mod commands;
 mod java;
 mod launcher;
+mod settings;
 mod types;
 mod utils;
 
@@ -14,8 +15,14 @@ mod neoforge;
 pub fn run() {
   tauri::Builder::default()
     .plugin(tauri_plugin_shell::init())
+    .plugin(tauri_plugin_opener::init())
     .invoke_handler(tauri::generate_handler![
         commands::launch_game,
+        commands::load_launcher_settings,
+        commands::save_launcher_settings,
+        commands::get_system_info,
+        commands::open_game_dir,
+        commands::delete_game,
     ])
     .setup(|app| {
       if cfg!(debug_assertions) {

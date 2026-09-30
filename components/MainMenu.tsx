@@ -7,9 +7,9 @@ import { FaGamepad } from 'react-icons/fa';
 import { useAuth } from '@/hooks/useAuth';
 import { useLauncher } from '@/hooks/useLauncher';
 import { sanitizeMinecraftUsername } from '@/lib/username';
+import LauncherSettingsModal from '@/components/LauncherSettingsModal';
 
 interface MainMenuProps {
-  onSettings: () => void;
   onAccountSettings: () => void;
 }
 
@@ -38,10 +38,11 @@ const CHANGELOG_HISTORY = [
   },
 ];
 
-export default function MainMenu({ onSettings, onAccountSettings }: MainMenuProps) {
+export default function MainMenu({ onAccountSettings }: MainMenuProps) {
   const { user, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [changelogOpen, setChangelogOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // ЕДИНСТВЕННЫЙ источник правды о запуске
@@ -62,7 +63,7 @@ export default function MainMenu({ onSettings, onAccountSettings }: MainMenuProp
   }, []);
 
   useEffect(() => {
-    if (changelogOpen || isLaunching) {
+    if (changelogOpen || settingsOpen || isLaunching) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -70,7 +71,7 @@ export default function MainMenu({ onSettings, onAccountSettings }: MainMenuProp
     return () => {
       document.body.style.overflow = '';
     };
-  }, [changelogOpen, isLaunching]);
+  }, [changelogOpen, settingsOpen, isLaunching]);
 
   // Ник берём из Discord (Supabase кладёт его в user_metadata). В GUI показываем как есть,
   // а в игру передаём санитизированный вариант (транслит + A-Za-z0-9_).
@@ -85,8 +86,9 @@ export default function MainMenu({ onSettings, onAccountSettings }: MainMenuProp
   const gameUsername = sanitizeMinecraftUsername(rawUsername);
 
   const handlePlay = () => {
-    // Используем стабильную версию NeoForge для 1.21.1
-    launch('1.21.1', '21.1.249', 4096, gameUsername);
+    // Используем стабильную версию NeoForge для 1.21.1.
+    // Память берём из настроек лаунчера (memoryMb: null → Rust читает settings.json)
+    launch('1.21.1', '21.1.249', null, gameUsername);
   };
 
   const email = user?.email || '';
@@ -102,8 +104,8 @@ export default function MainMenu({ onSettings, onAccountSettings }: MainMenuProp
         <div className="brand">
           <div className="brand-icon"><FaGamepad size={18} /></div>
           <div className="brand-text">
-            <h1>Minecraft Launcher</h1>
-            <span>Modded Edition</span>
+            <h1>StructureCraft</h1>
+            <span>Modded launcher</span>
           </div>
         </div>
 
@@ -123,7 +125,7 @@ export default function MainMenu({ onSettings, onAccountSettings }: MainMenuProp
                 </div>
                 <div className="dropdown-divider" />
                 <button className="dropdown-option" onClick={onAccountSettings}><FiUser size={14} /> Профиль</button>
-                <button className="dropdown-option" onClick={onSettings}><FiSettings size={14} /> Настройки</button>
+                <button className="dropdown-option" onClick={() => { setMenuOpen(false); setSettingsOpen(true); }}><FiSettings size={14} /> Настройки</button>
                 <div className="dropdown-divider" />
                 <button className="dropdown-option logout" onClick={handleLogout}><FiLogOut size={14} /> Выйти</button>
               </motion.div>
@@ -254,6 +256,9 @@ export default function MainMenu({ onSettings, onAccountSettings }: MainMenuProp
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Модалка настроек лаунчера */}
+      <LauncherSettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   );
 }
